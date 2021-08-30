@@ -1,0 +1,50 @@
+<table>
+    <tr>
+      <td>Price</td>
+      <td>Quantity</td>
+      <td>Total</td>
+    </tr>
+    <tr>
+      <td id="price"></td>
+      <td id="quantity"></td>
+      <td id="total"></td>
+    </tr>
+</table>
+
+<div>Your card will be charged: <span id="card-charge-total"></span></div>
+
+<!-- 3. This line has changed. -->
+<button onclick="pageData.quantity = pageData.quantity + 1">Increase Quantity</button>
+
+
+<script>
+// 1. convert data points to an object
+let pageData = {
+    price: 13,
+    quantity: 2
+}
+let total = pageData.price * pageData.quantity;
+
+// 2. Iterate through each data point and set up their
+// getters and setters
+Object.keys(pageData).forEach(key => {
+    let internalValue = pageData[key]; // use a closure to store the property value
+
+    Object.defineProperty(pageData, key, {
+        get() {
+            return internalValue;
+        },
+        set(newVal) {
+            internalValue = newVal;
+            total = pageData.price * pageData.quantity; // rerun the computation!
+        }
+    });
+});
+
+// 3. The next 2 lines have changed!
+document.getElementById('price').innerHTML = pageData.price;
+document.getElementById('quantity').innerHTML = pageData.quantity;
+
+document.getElementById('total').innerHTML = total;
+document.getElementById('card-charge-total').innerHTML = total;
+</script>

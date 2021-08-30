@@ -1,0 +1,28 @@
+<table>
+    <tr>
+      <td>Price</td>
+      <td>Quantity</td>
+      <td>Total</td>
+    </tr>
+    <tr>
+      <td id="price"></td>
+      <td id="quantity"></td>
+      <td id="total"></td>
+    </tr>
+</table>
+
+<div>Your card will be charged: <span id="card-charge-total"></span></div>
+
+<button onclick="quantity = quantity + 1">Increase Quantity</button>
+
+
+<script>
+let price = 13;
+let quantity = 2;
+let total = price * quantity;
+
+document.getElementById('price').innerHTML = price;
+document.getElementById('quantity').innerHTML = quantity;
+document.getElementById('total').innerHTML = total;
+document.getElementById('card-charge-total').innerHTML = total;
+</script>

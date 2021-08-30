@@ -1,0 +1,36 @@
+<span id="app">
+  <table>
+    <tr>
+      <td>Price</td>
+      <td>Quantity</td>
+      <td>Total</td>
+    </tr>
+    <tr>
+      <td>{{ price }}</td>
+      <td>{{ quantity }}</td>
+      <td>{{ total }}</td>
+    </tr>
+  </table>
+
+  <div>Your card will be charged: {{ total }}</div>
+  
+  <button @click="quantity = quantity + 1">Increase Quantity</button>
+</span>
+
+<script src="https://unpkg.com/vue"></script>
+<script>
+    const app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                price: 13,
+                quantity: 2
+            }
+        },
+        computed: {
+            total() {
+                return this.price * this.quantity
+            }
+        }
+    })
+</script>

@@ -1,0 +1,84 @@
+<table>
+    <tr>
+      <td>Price</td>
+      <td>Quantity</td>
+      <td>Total</td>
+    </tr>
+    <tr>
+      <td id="price"></td>
+      <td id="quantity"></td>
+      <td id="total"></td>
+    </tr>
+</table>
+
+<div>Your card will be charged: <span id="card-charge-total"></span></div>
+
+<button onclick="pageData.quantity = pageData.quantity + 1">Increase Quantity</button>
+
+
+<script>
+// 1. This is new!
+class Observer {
+    constructor() {
+        this.computations = []; // A collection of all things to do when state changes
+    }
+
+    // Add to the computations list
+    addToComputationsList() {
+        if (currentlyExecutingComputationFunction && !this.computations.includes(currentlyExecutingComputationFunction)) {
+            this.computations.push(currentlyExecutingComputationFunction);
+        }
+    }
+
+    // Execute each function in the computationsToRun list
+    executeComputations() {
+        this.computations.forEach(computation => computation());
+    }
+}
+
+let pageData = {
+    price: 13,
+    quantity: 2
+}
+let total;
+let rewards;
+let currentlyExecutingComputationFunction; // 4. This is new; temporary storage for a computation function
+
+Object.keys(pageData).forEach(key => {
+    let internalValue = pageData[key];
+    const observer = new Observer(); // 2. This is new!
+
+    Object.defineProperty(pageData, key, {
+        get() {
+            observer.addToComputationsList(); // 3. This is new!
+            return internalValue;
+        },
+        set(newVal) {
+            internalValue = newVal;
+            observer.executeComputations();  // 2. This is new!
+        }
+    });
+});
+
+// 5. This is new
+function watcher(computationFunction) {
+    currentlyExecutingComputationFunction = computationFunction;
+    currentlyExecutingComputationFunction();
+    currentlyExecutingComputationFunction = null;
+}
+
+// 6. This is new
+watcher(function () {
+    total = pageData.price * pageData.quantity;
+});
+
+// 6. This is new
+watcher(function () {
+    rewards = pageData.quantity * 3;
+});
+
+document.getElementById('price').innerHTML = pageData.price;
+document.getElementById('quantity').innerHTML = pageData.quantity;
+document.getElementById('total').innerHTML = total;
+document.getElementById('card-charge-total').innerHTML = total;
+</script>

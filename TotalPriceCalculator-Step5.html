@@ -1,0 +1,120 @@
+<table id="app">
+    <tr>
+      <td>Price</td>
+      <td>Quantity</td>
+      <td>Total</td>
+    </tr>
+    <tr>
+      <td id="price"></td>
+      <td id="quantity"></td>
+      <td id="total"></td>
+    </tr>
+</table>
+
+<div>Your card will be charged: <span id="card-charge-total"></span></div>
+<div>Your will get <span id="rewards"></span> reward points.</div>
+
+<button onclick="pageData.quantity = pageData.quantity + 1">Increase Quantity</button>
+
+<script>
+class ACLVue {
+    constructor(el, data, computed) {
+        setUpReactivity();
+
+        let html = watcher(render());
+
+        document.getElementById(el).innerHTML;
+    }
+
+    setUpReactivity() {
+        // Go through data properties and set up using Object.defineProperty()
+        Object.keys(this.data).forEach(key => {
+            let internalValue = pageData[key];
+            const observer = new Observer();
+        
+            Object.defineProperty(pageData, key, {
+                get() {
+                    observer.addToComputationsList();
+                    return internalValue;
+                },
+                set(newVal) {
+                    internalValue = newVal;
+                    observer.executeComputations();
+                }
+            });
+        });
+
+        // Go through computed properties and execute using watcher
+        Object.keys(this.computed).forEach(key => {
+            watcher(this.computed[key]);
+        });
+    }
+}
+
+let currentlyExecutingComputationFunction;
+class Observer {
+    constructor() {
+        this.computations = [];
+    }
+
+    addToComputationsList() {
+        if (currentlyExecutingComputationFunction && !this.computations.includes(currentlyExecutingComputationFunction)) {
+            this.computations.push(currentlyExecutingComputationFunction);
+        }
+    }
+
+    executeComputations() {
+        this.computations.forEach(computation => computation());
+    }
+}
+
+function watcher(computationFunction) {
+    currentlyExecutingComputationFunction = computationFunction;
+    currentlyExecutingComputationFunction();
+    currentlyExecutingComputationFunction = null;
+}
+
+// This is new, we pulled the DOM manipulation we had earlier into a function.
+function render() {
+    document.getElementById('price').innerHTML = pageData.price;
+    document.getElementById('quantity').innerHTML = pageData.quantity;
+    document.getElementById('total').innerHTML = total;
+    document.getElementById('card-charge-total').innerHTML = total;
+    document.getElementById('rewards').innerHTML = rewards;
+}
+</script>
+<script>
+new ACLVue({
+    el: "app",
+    data: {
+        price: 13,
+        quantity: 2
+    },
+    computed: {
+        total: function() {
+            pageData.price * pageData.quantity;
+        },
+        rewards: function() {
+            pageData.quantity * 3;
+        }
+    }
+});
+
+let pageData = {
+    price: 13,
+    quantity: 2
+}
+let total;
+let rewards;
+
+watcher(function () {
+    total = pageData.price * pageData.quantity;
+});
+
+watcher(function () {
+    rewards = pageData.quantity * 3;
+});
+
+// This is new
+watcher(render);
+</script>
